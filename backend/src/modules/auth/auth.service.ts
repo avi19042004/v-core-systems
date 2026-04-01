@@ -9,12 +9,12 @@ export class AuthService {
     constructor(private prisma: PrismaService){}
 
     async signUp(data: SignUpDto){
-        const { username, name, password } = data;
+        const { username, name, password, permissionGroupId } = data;
         
         const exsistingUsername = await this.prisma.user.findUnique({
             where: {username}
         })
-        if(exsistingUsername) throw new ConflictException('Username already exists');
+        if(exsistingUsername) throw new ConflictException({msg: 'Username already exists' });
 
         const hashPassword = await bcrypt.hash(password, 10);
 
@@ -22,6 +22,7 @@ export class AuthService {
             data: {
                 username,
                 name,
+                permissionGroupId,
                 password: hashPassword
             }
         });
@@ -35,7 +36,7 @@ export class AuthService {
         const user = await this.prisma.user.findUnique({
             where:{username}
         });
-        if(!user) throw new UnauthorizedException('Invalid username or password');
+        if(!user) throw new UnauthorizedException({ msg: 'Invalid username or password' });
 
         const isPasswordReal = await bcrypt.compare(password, user.password);
         if(!isPasswordReal) throw new UnauthorizedException('Invalid username or password');

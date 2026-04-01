@@ -15,4 +15,8 @@ export class SignUpDto {
         message: 'Password is too weak. Must include uppercase, lowercase, numbers, and symbols (like #)',
     })
     password: string;
+
+    @IsString()
+    @IsNotEmpty({ message: 'permissionsGroupId is required' })
+    permissionGroupId: string;
 }

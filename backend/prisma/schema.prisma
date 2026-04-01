@@ -18,6 +18,10 @@ model User {
   updatedAt DateTime @updatedAt
 
   permissionGroup PermissionGroup @relation(fields: [permissionGroupId], references: [id])
+  itemsCreated ItemMaster[] @relation("ItemCreatedBy")
+  ItemsUpdated ItemMaster[] @relation("ItemUpdateBy")
+  hsnsCreated HSNMaster[] @relation("HsnCreatedBy")
+  hsnsUpdated HSNMaster[] @relation("HsnUpdateBy")
 }
 
 model PermissionGroup {
@@ -28,4 +32,30 @@ model PermissionGroup {
   updatedAt DateTime @updatedAt
 
   users User[]
+}
+
+model ItemMaster {
+  id String @id @default(uuid())
+  itemName String @unique
+  hsnCode String
+  createdById String
+  updatedById String
+
+  hsnMaster HSNMaster @relation(fields: [hsnCode], references: [hsnCode])
+  createdBy User @relation("ItemCreatedBy", fields: [createdById], references: [id])
+  updateBy User @relation("ItemUpdateBy", fields: [updatedById], references: [id])
+}
+
+model HSNMaster {
+  hsnCode          String   @id
+  importGST        Float
+  saleGST          Float
+  localPurchaseGST Float
+  createdAt        DateTime @default(now())
+  createdById String
+  updatedById String
+
+  items ItemMaster[]
+  createdBy User @relation("HsnCreatedBy", fields: [createdById], references: [id])
+  updateBy User @relation("HsnUpdateBy", fields: [updatedById], references: [id])
 }
