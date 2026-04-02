@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PermissionsGroupDto } from './dto/permissions-group.dto';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '@app/common/databaseService/prisma.service';
 
 @Injectable()
 export class PermissionsGroupsService {

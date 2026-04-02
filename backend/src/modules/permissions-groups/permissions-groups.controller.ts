@@ -8,7 +8,7 @@ export class PermissionsGroupsController {
 
   @Post()
   create(@Body() createPermissionsGroupDto: PermissionsGroupDto) {
-    return this.permissionsGroupsService.create(createPermissionsGroupDto);
+    return this.permissionsGroupsService.createPermissionGroup(createPermissionsGroupDto);
   }
 
   @Get()
@@ -23,7 +23,6 @@ export class PermissionsGroupsController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePermissionsGroupDto: PermissionsGroupDto) {
-    return this.permissionsGroupsService.update(+id, PermissionsGroupDto);
   }
 
   @Delete(':id')

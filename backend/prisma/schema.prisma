@@ -8,8 +8,10 @@ datasource db {
   provider = "postgresql"
 }
 
+
+//Auth & Rolebase Access Control
 model User { 
-  id String @id @default(uuid())
+  userId String @id @default(uuid())
   username String @unique
   name String
   password String
@@ -17,15 +19,19 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  permissionGroup PermissionGroup @relation(fields: [permissionGroupId], references: [id])
+  permissionGroup PermissionGroup @relation(fields: [permissionGroupId], references: [permissionGroupId])
   itemsCreated ItemMaster[] @relation("ItemCreatedBy")
-  ItemsUpdated ItemMaster[] @relation("ItemUpdateBy")
+  itemsUpdated ItemMaster[] @relation("ItemUpdatedBy")
   hsnsCreated HSNMaster[] @relation("HsnCreatedBy")
-  hsnsUpdated HSNMaster[] @relation("HsnUpdateBy")
+  hsnsUpdated HSNMaster[] @relation("HsnUpdatedBy")
+  lotCreated LotMaster[] @relation("LotCreatedBy")
+  lotUpdated LotMaster[] @relation("LotUpdatedBy")
+  wareHouseCreated WareHouse[] @relation("WareHouseCreatedBy")
+  wareHouseUpdated WareHouse[] @relation("WareHouseUpdatedBy")
 }
 
 model PermissionGroup {
-  id String @id @default(uuid())
+  permissionGroupId String @id @default(uuid())
   name String @unique
   permissions Json
   createdAt DateTime @default(now())
@@ -34,28 +40,75 @@ model PermissionGroup {
   users User[]
 }
 
+
+// Inventory
 model ItemMaster {
-  id String @id @default(uuid())
+  itemCode String @id @default(uuid())
   itemName String @unique
   hsnCode String
   createdById String
   updatedById String
 
+  lots LotMaster[]
+  inventory Inventory[]
   hsnMaster HSNMaster @relation(fields: [hsnCode], references: [hsnCode])
-  createdBy User @relation("ItemCreatedBy", fields: [createdById], references: [id])
-  updateBy User @relation("ItemUpdateBy", fields: [updatedById], references: [id])
+  createdBy User @relation("ItemCreatedBy", fields: [createdById], references: [userId])
+  updatedBy User @relation("ItemUpdatedBy", fields: [updatedById], references: [userId])
 }
 
 model HSNMaster {
-  hsnCode          String   @id
-  importGST        Float
-  saleGST          Float
+  hsnCode String   @id
+  description String
+  importGST Float
+  saleGST Float
   localPurchaseGST Float
-  createdAt        DateTime @default(now())
+  createdAt DateTime @default(now())
   createdById String
   updatedById String
 
   items ItemMaster[]
-  createdBy User @relation("HsnCreatedBy", fields: [createdById], references: [id])
-  updateBy User @relation("HsnUpdateBy", fields: [updatedById], references: [id])
+  createdBy User @relation("HsnCreatedBy", fields: [createdById], references: [userId])
+  updatedBy User @relation("HsnUpdatedBy", fields: [updatedById], references: [userId])
+}
+
+model LotMaster {
+  lotNumber String @id
+  itemId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  createdById String
+  updatedById String
+
+  inventory Inventory[]
+  itemMaster ItemMaster @relation(fields: [itemId], references: [itemCode])  
+  createdBy User @relation("LotCreatedBy", fields: [createdById], references: [userId])
+  updatedBy User @relation("LotUpdatedBy", fields: [updatedById], references: [userId])
+}
+
+model WareHouse{
+  WareHouseId String @id @default(uuid())
+  wareHouseName String @unique
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  createdById String
+  updatedById String
+
+  inventory Inventory[]
+  createdBy User @relation("WareHouseCreatedBy", fields: [createdById], references: [userId])
+  updatedBy User @relation("WareHouseUpdatedBy", fields: [updatedById], references: [userId])
+
+}
+
+model Inventory {
+  itemId String
+  warehouseId String
+  lotNumber String
+  stock Float @default(0)
+
+  item ItemMaster @relation(fields: [itemId], references: [itemCode])
+  wareHouse WareHouse @relation(fields: [warehouseId], references: [WareHouseId])
+  lotMaster LotMaster @relation(fields: [lotNumber], references: [lotNumber])
+
+  @@id([itemId, warehouseId, lotNumber])
 }

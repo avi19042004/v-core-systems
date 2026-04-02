@@ -6,6 +6,7 @@ import { UsersModule } from './modules/users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { PermissionsGroupsModule } from './modules/permissions-groups/permissions-groups.module';
 import { ItemMasterModule } from './modules/item-master/item-master.module';
+import { PrismaService } from '@app/common/databaseService/prisma.service';
 
 @Module({
   imports: [
@@ -19,6 +20,6 @@ import { ItemMasterModule } from './modules/item-master/item-master.module';
     ItemMasterModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}
