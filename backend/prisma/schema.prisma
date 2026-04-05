@@ -22,6 +22,8 @@ model User {
   permissionGroup PermissionGroup @relation(fields: [permissionGroupId], references: [permissionGroupId])
   itemsCreated ItemMaster[] @relation("ItemCreatedBy")
   itemsUpdated ItemMaster[] @relation("ItemUpdatedBy")
+  itemGroupCreated ItemGroupMaster[] @relation("ItemGroupCreatedBy")
+  itemGroupUpdated ItemGroupMaster[] @relation("ItemGroupUpdatedBy")
   hsnsCreated HSNMaster[] @relation("HsnCreatedBy")
   hsnsUpdated HSNMaster[] @relation("HsnUpdatedBy")
   lotCreated LotMaster[] @relation("LotCreatedBy")
@@ -45,15 +47,35 @@ model PermissionGroup {
 model ItemMaster {
   itemCode String @id @default(uuid())
   itemName String @unique
+  itemGroupId String
   hsnCode String
+  umo String
   createdById String
+  createdAt DateTime @default(now())
   updatedById String
+  updatedAt DateTime @updatedAt
 
   lots LotMaster[]
   inventory Inventory[]
+  stockLedger StockLedger[]
+  itemGroupMaster ItemGroupMaster @relation(fields: [itemGroupId], references: [itemGroupId])
   hsnMaster HSNMaster @relation(fields: [hsnCode], references: [hsnCode])
   createdBy User @relation("ItemCreatedBy", fields: [createdById], references: [userId])
   updatedBy User @relation("ItemUpdatedBy", fields: [updatedById], references: [userId])
+}
+
+model ItemGroupMaster {
+  itemGroupId String @id @default(uuid())
+  itemGroupName String @unique
+  description String
+  createdById String
+  createdAt DateTime @default(now())
+  updatedById String
+  updatedAt DateTime @updatedAt
+
+  items ItemMaster[]
+  createdBy User @relation("ItemGroupCreatedBy", fields: [createdById], references: [userId])
+  updatedBy User @relation("ItemGroupUpdatedBy", fields: [updatedById], references: [userId])  
 }
 
 model HSNMaster {
@@ -62,9 +84,10 @@ model HSNMaster {
   importGST Float
   saleGST Float
   localPurchaseGST Float
-  createdAt DateTime @default(now())
   createdById String
+  createdAt DateTime @default(now())
   updatedById String
+  updatedAt DateTime @updatedAt
 
   items ItemMaster[]
   createdBy User @relation("HsnCreatedBy", fields: [createdById], references: [userId])
@@ -75,26 +98,28 @@ model LotMaster {
   lotNumber String @id
   itemId String
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
   createdById String
   updatedById String
 
   inventory Inventory[]
+  stockLedger StockLedger[]
   itemMaster ItemMaster @relation(fields: [itemId], references: [itemCode])  
   createdBy User @relation("LotCreatedBy", fields: [createdById], references: [userId])
   updatedBy User @relation("LotUpdatedBy", fields: [updatedById], references: [userId])
 }
 
 model WareHouse{
-  WareHouseId String @id @default(uuid())
+  warehouseId String @id @default(uuid())
   wareHouseName String @unique
   isActive Boolean @default(true)
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
   createdById String
   updatedById String
 
   inventory Inventory[]
+  stockledger StockLedger[]
   createdBy User @relation("WareHouseCreatedBy", fields: [createdById], references: [userId])
   updatedBy User @relation("WareHouseUpdatedBy", fields: [updatedById], references: [userId])
 
@@ -107,8 +132,25 @@ model Inventory {
   stock Float @default(0)
 
   item ItemMaster @relation(fields: [itemId], references: [itemCode])
-  wareHouse WareHouse @relation(fields: [warehouseId], references: [WareHouseId])
+  wareHouse WareHouse @relation(fields: [warehouseId], references: [warehouseId])
   lotMaster LotMaster @relation(fields: [lotNumber], references: [lotNumber])
 
   @@id([itemId, warehouseId, lotNumber])
+}
+
+model StockLedger {
+  ledgerId String @id @default(uuid())
+  itemId String
+  warehouseId String
+  lotNumber String
+  quntity Float
+  transactionType String
+  transactionDate DateTime @default(now())
+  referenceId String
+  remarks String
+  createdById String
+
+  item ItemMaster @relation(fields: [itemId], references: [itemCode])
+  warehouse  WareHouse @relation(fields: [warehouseId], references: [warehouseId])
+  lotnumber LotMaster @relation(fields: [lotNumber], references: [lotNumber])
 }

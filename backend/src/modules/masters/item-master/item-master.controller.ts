@@ -7,7 +7,7 @@ import { UpdateItemMasterDto } from './dto/update-item-master.dto';
 export class ItemMasterController {
   constructor(private readonly itemMasterService: ItemMasterService) {}
 
-  @Post()
+  @Post('create')
   create(@Body() createItemMasterDto: CreateItemMasterDto) {
     return this.itemMasterService.create(createItemMasterDto);
   }
@@ -19,16 +19,11 @@ export class ItemMasterController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.itemMasterService.findOne(+id);
+    return this.itemMasterService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateItemMasterDto: UpdateItemMasterDto) {
-    return this.itemMasterService.update(+id, updateItemMasterDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.itemMasterService.remove(+id);
+    return this.itemMasterService.update(id, updateItemMasterDto);
   }
 }
