@@ -1,6 +1,5 @@
 import { IsString, IsNotEmpty, IsUUID } from 'class-validator';
 
-
 export class CreateItemMasterDto {
     @IsString()
     @IsNotEmpty({message: "itemName Can Not Be Empty"})

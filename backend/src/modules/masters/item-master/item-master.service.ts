@@ -1,6 +1,6 @@
   import { BadRequestException, ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
   import { UpdateItemMasterDto } from './dto/update-item-master.dto';
-  import { PrismaService } from '@app/common/databaseService/prisma.service';
+  import { PrismaService } from '@app/common/databaseService/db.service';
   import { Prisma } from '@generated/prisma/client';
   import { CreateItemMasterDto } from './dto/create-item-master.dto';
 
